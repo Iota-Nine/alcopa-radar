@@ -60,8 +60,18 @@ export function isCaptchaPage(html: string): boolean {
   return (
     html.includes("Human Verification") ||
     html.includes("captcha-container") ||
-    html.includes("AwsWafIntegration")
+    html.includes("AwsWafIntegration") ||
+    html.includes("challenge-container") ||
+    html.includes("cf-browser-verification")
   );
+}
+
+/** Page Alcopa sans calendrier (blocage cloud, WAF, HTML vide). */
+export function isBlockedCalendarHtml(html: string): boolean {
+  if (isCaptchaPage(html)) return true;
+  const hasSales = /vente-encheres-en-ligne|online-auction|salle-de-vente-encheres/i.test(html);
+  if (!hasSales && html.length < 80_000) return true;
+  return false;
 }
 
 export function normalizeAlcopaUrl(input: string): string {

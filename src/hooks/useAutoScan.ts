@@ -676,6 +676,8 @@ export function useAutoScan(
         const { ok: salesOk, data: salesData } = await fetchJson<{
           sales?: { url: string }[];
           error?: string;
+          blocked?: boolean;
+          totalOnCalendar?: number;
         }>(`/api/catalog/sales?maxDays=${maxDaysUntilAuction}`, undefined, 45_000);
 
         if (salesData.error) {
@@ -688,8 +690,15 @@ export function useAutoScan(
         const sales: { url: string }[] = salesData.sales ?? [];
 
         if (sales.length === 0) {
+          if (salesData.blocked) {
+            throw new Error(
+              salesData.error ??
+                "Alcopa bloque le scan depuis Vercel. Lancez l'app en local (npm run start) ou sur un VPS."
+            );
+          }
           throw new Error(
-            `Aucune vente Alcopa ne se termine dans les ${maxDaysUntilAuction} prochain(s) jour(s).`
+            salesData.error ??
+              `Aucune vente Alcopa ne se termine dans les ${maxDaysUntilAuction} prochain(s) jour(s)${salesData.totalOnCalendar ? ` (${salesData.totalOnCalendar} vente(s) plus loin sur le calendrier)` : ""}.`
           );
         }
 

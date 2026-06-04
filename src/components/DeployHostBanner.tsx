@@ -7,6 +7,8 @@ interface HealthPayload {
   ok: boolean;
   host: string;
   salesCount: number;
+  totalOnCalendar?: number;
+  blocked?: boolean;
   alcopaError: string | null;
   hint: string | null;
 }
@@ -33,7 +35,7 @@ export function DeployHostBanner() {
 
   if (!isVercelBuild) return null;
 
-  const alcopaBlocked = health && !health.ok;
+  const alcopaBlocked = health && (health.blocked || !health.ok);
 
   return (
     <div className="mb-6 space-y-3">

@@ -6,30 +6,20 @@ export const maxDuration = 25;
 
 export async function GET() {
   const started = Date.now();
-  let alcopaOk = false;
-  let salesCount = 0;
-  let alcopaError: string | null = null;
-
-  try {
-    const sales = await fetchActiveSalesWithDeadline(1);
-    salesCount = sales.length;
-    alcopaOk = sales.length > 0;
-    if (!alcopaOk) {
-      alcopaError =
-        "Calendrier Alcopa vide ou inaccessible (captcha / blocage IP cloud fréquent sur Vercel).";
-    }
-  } catch (err) {
-    alcopaError = err instanceof Error ? err.message : "Erreur Alcopa";
-  }
+  const result = await fetchActiveSalesWithDeadline(2);
 
   return NextResponse.json({
-    ok: alcopaOk,
+    ok: result.sales.length > 0,
     host: isVercel() ? "vercel" : "local",
-    salesCount,
-    alcopaError,
+    salesCount: result.sales.length,
+    totalOnCalendar: result.totalOnCalendar,
+    blocked: result.blocked,
+    alcopaError: result.error ?? null,
     latencyMs: Date.now() - started,
-    hint: isVercel()
-      ? "Sur Vercel, le scan masse est limité. Utilisez « Analyser un lien » ou lancez l’app en local pour le radar complet."
-      : null,
+    hint: result.blocked
+      ? "Alcopa bloque les IP cloud (Vercel). Utilisez npm run start sur votre PC pour le scan complet."
+      : result.sales.length === 0
+        ? "Élargissez le filtre « jours max » ou réessayez plus tard."
+        : null,
   });
 }

@@ -19,6 +19,7 @@ import {
   extractVehicleLinks,
   hasNextListingPage,
   isCaptchaPage,
+  isBlockedCalendarHtml,
   isValidSaleListingUrl,
   listingPageUrl,
   normalizeAlcopaUrl,
@@ -399,31 +400,70 @@ export async function scrapeListing(
 
 /** Liste des ventes actives depuis le calendrier (rapide, ~2 s). */
 export async function fetchActiveSales(): Promise<string[]> {
-  const sales = await fetchActiveSalesWithDeadline(999);
-  return sales.map((s) => s.url);
+  const result = await fetchActiveSalesWithDeadline(999);
+  return result.sales.map((s) => s.url);
+}
+
+export interface SalesFetchResult {
+  sales: AlcopaSaleDeadline[];
+  totalOnCalendar: number;
+  blocked: boolean;
+  error?: string;
 }
 
 /** Ventes dont l'enchère se termine dans au plus `maxDays` (ex. 1 = sous 24 h). */
 export async function fetchActiveSalesWithDeadline(
   maxDays = 1
-): Promise<AlcopaSaleDeadline[]> {
+): Promise<SalesFetchResult> {
   const sources = [
     `${BASE_URL}/calendrier-des-ventes`,
     `${BASE_URL}/calendrier-des-ventes/`,
   ];
 
+  let lastError: string | undefined;
+  let bestTotal = 0;
+
   for (const src of sources) {
     try {
       const html = await fetchHtml(src);
+      if (isBlockedCalendarHtml(html)) {
+        lastError =
+          "Alcopa bloque l'accès depuis ce serveur (IP cloud / captcha). Le scan ne fonctionne pas sur Vercel — lancez l'app en local.";
+        continue;
+      }
+
       const all = extractSalesWithDeadline(html);
+      bestTotal = Math.max(bestTotal, all.length);
+
+      if (all.length === 0) {
+        lastError = "Calendrier Alcopa lu mais aucune vente détectée.";
+        continue;
+      }
+
       const filtered = filterSalesByMaxDays(all, maxDays);
-      if (filtered.length > 0) return filtered;
-    } catch {
-      /* essai source suivante */
+      if (filtered.length > 0) {
+        return { sales: filtered, totalOnCalendar: all.length, blocked: false };
+      }
+
+      lastError = `Aucune vente ne se termine dans les ${maxDays} prochain(s) jour(s) (${all.length} vente(s) au calendrier). Élargissez le filtre « jours max ».`;
+    } catch (err) {
+      lastError =
+        err instanceof Error
+          ? err.message
+          : "Impossible de charger le calendrier Alcopa.";
     }
   }
 
-  return [];
+  return {
+    sales: [],
+    totalOnCalendar: bestTotal,
+    blocked: Boolean(
+      lastError?.includes("bloque") ||
+        lastError?.includes("captcha") ||
+        (bestTotal === 0 && lastError)
+    ),
+    error: lastError,
+  };
 }
 
 /** Une page de lots pour une vente donnée. */
