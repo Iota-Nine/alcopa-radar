@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+:root {
+  --background: #020617;
+  --foreground: #f1f5f9;
+  --accent-blue: #3b82f6;
+  --accent-violet: #8b5cf6;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background:
+    radial-gradient(ellipse 90% 55% at 50% -15%, rgba(59, 130, 246, 0.14), transparent),
+    radial-gradient(ellipse 55% 45% at 100% 0%, rgba(139, 92, 246, 0.1), transparent),
+    radial-gradient(ellipse 40% 35% at 0% 100%, rgba(16, 185, 129, 0.06), transparent),
+    var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+input,
+select,
+textarea {
+  color-scheme: dark;
+}
+
+.glass-panel {
+  background: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(51, 65, 85, 0.65);
+}
+
+.nav-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.nav-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes live-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.live-item {
+  animation: live-fade-in 0.35s ease-out forwards;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.progress-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgb(37 99 235) 0%,
+    rgb(96 165 250) 45%,
+    rgb(59 130 246) 55%,
+    rgb(37 99 235) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2.2s ease-in-out infinite;
+}
+
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.65;
+  }
+}
+
+.pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
