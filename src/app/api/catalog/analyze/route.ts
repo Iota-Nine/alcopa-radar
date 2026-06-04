@@ -2,32 +2,37 @@ import { NextResponse } from "next/server";
 import { analyzeVehicleUrls } from "@/lib/alcopa/scraper";
 import { vehicleForCarteGrise } from "@/lib/expert/carte-grise";
 import { analyzeVehicle } from "@/lib/expert/engine";
+import {
+  analyzeBatchSize,
+  analyzeConcurrency,
+  isVercel,
+  skipCtOnServer,
+} from "@/lib/runtime/deploy-env";
 import type { ScoredVehicle } from "@/types/vehicle";
 
-export const maxDuration = 300;
-
-const MAX_BATCH = 20;
+export const maxDuration = 60;
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     const urls = body.urls as string[];
     const saleFeesByUrl = body.saleFeesByUrl as Record<string, boolean> | undefined;
+    const maxBatch = analyzeBatchSize();
 
     if (!Array.isArray(urls) || urls.length === 0) {
       return NextResponse.json({ error: "Liste d'URLs requise" }, { status: 400 });
     }
 
-    if (urls.length > MAX_BATCH) {
+    if (urls.length > maxBatch) {
       return NextResponse.json(
-        { error: `Maximum ${MAX_BATCH} véhicules par lot` },
+        { error: `Maximum ${maxBatch} véhicules par lot${isVercel() ? " (mode Vercel)" : ""}` },
         { status: 400 }
       );
     }
 
-    const skipCtPdf = body.skipCtPdf !== false;
+    const skipCtPdf = skipCtOnServer() ? true : body.skipCtPdf !== false;
 
-    const vehicles = await analyzeVehicleUrls(urls, 6, saleFeesByUrl, {
+    const vehicles = await analyzeVehicleUrls(urls, analyzeConcurrency(), saleFeesByUrl, {
       skipCtPdf,
     });
     const results: ScoredVehicle[] = vehicles.map((raw) => {

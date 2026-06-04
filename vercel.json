@@ -1,0 +1,22 @@
+{
+  "functions": {
+    "src/app/api/catalog/analyze/route.ts": {
+      "maxDuration": 60
+    },
+    "src/app/api/scan/route.ts": {
+      "maxDuration": 60
+    },
+    "src/app/api/catalog/discover/route.ts": {
+      "maxDuration": 60
+    },
+    "src/app/api/catalog/discover-page/route.ts": {
+      "maxDuration": 30
+    },
+    "src/app/api/catalog/sales/route.ts": {
+      "maxDuration": 30
+    },
+    "src/app/api/catalog/refresh-prices/route.ts": {
+      "maxDuration": 30
+    }
+  }
+}

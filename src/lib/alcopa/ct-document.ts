@@ -3,8 +3,9 @@ import { pathToFileURL } from "node:url";
 import { createCanvas } from "@napi-rs/canvas";
 import { createWorker, type Worker } from "tesseract.js";
 import { FETCH_HEADERS } from "@/lib/alcopa/fetch-headers";
+import { skipCtOnServer } from "@/lib/runtime/deploy-env";
 
-const CT_FETCH_TIMEOUT_MS = 28_000;
+const CT_FETCH_TIMEOUT_MS = skipCtOnServer() ? 8_000 : 28_000;
 const OCR_MAX_PDF_PAGES = 3;
 const BASE_URL = "https://www.alcopa-auction.fr";
 
@@ -110,6 +111,7 @@ async function getOcrWorker(): Promise<Worker> {
 }
 
 async function ocrImageBuffer(imageBuffer: Buffer): Promise<string | undefined> {
+  if (skipCtOnServer()) return undefined;
   try {
     const worker = await getOcrWorker();
     const { data } = await worker.recognize(imageBuffer);
@@ -121,6 +123,7 @@ async function ocrImageBuffer(imageBuffer: Buffer): Promise<string | undefined> 
 }
 
 async function ocrPdfBuffer(buffer: Buffer): Promise<string | undefined> {
+  if (skipCtOnServer()) return undefined;
   try {
     const pdfjs = await getPdfJs();
     const pdf = await pdfjs.getDocument({ data: new Uint8Array(buffer), useSystemFonts: true })

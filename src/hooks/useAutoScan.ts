@@ -25,11 +25,13 @@ export interface RunScanOptions {
   forceFull?: boolean;
 }
 
-const ANALYZE_BATCH = 18;
-const REFRESH_BATCH = 25;
-const DETAIL_REFRESH_BATCH = 8;
-const MAX_PARALLEL_BATCHES = 3;
-const CT_ENRICH_TOP = 35;
+const IS_VERCEL_CLIENT = process.env.NEXT_PUBLIC_DEPLOY_HOST === "vercel";
+
+const ANALYZE_BATCH = IS_VERCEL_CLIENT ? 3 : 18;
+const REFRESH_BATCH = IS_VERCEL_CLIENT ? 12 : 25;
+const DETAIL_REFRESH_BATCH = IS_VERCEL_CLIENT ? 3 : 8;
+const MAX_PARALLEL_BATCHES = IS_VERCEL_CLIENT ? 1 : 3;
+const CT_ENRICH_TOP = IS_VERCEL_CLIENT ? 0 : 35;
 const CT_ENRICH_BATCH = 5;
 const MAX_PAGES_PER_SALE = 80;
 const LIVE_PRICE_INTERVAL_MS = 45_000;

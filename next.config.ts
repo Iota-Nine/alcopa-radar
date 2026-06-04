@@ -6,6 +6,9 @@ import type { NextConfig } from "next";
 const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
 const nextConfig: NextConfig = {
+  env: {
+    NEXT_PUBLIC_DEPLOY_HOST: process.env.VERCEL === "1" ? "vercel" : "local",
+  },
   turbopack: {
     root: projectRoot,
   },
