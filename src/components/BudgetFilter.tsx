@@ -1,6 +1,7 @@
 "use client";
 
 import { SlidersHorizontal } from "lucide-react";
+import { VehicleCategoryFilterBar } from "@/components/VehicleCategoryFilter";
 import { BUDGET_SLIDER_MAX, BUDGET_SLIDER_STEP } from "@/lib/storage/client";
 import type { AlertConfig } from "@/types/vehicle";
 
@@ -45,6 +46,16 @@ export function BudgetFilter({ config, onChange, matchedCount, totalCount }: Pro
         )}
       </div>
 
+      <div className="mb-4 pb-4 border-b border-slate-800">
+        <VehicleCategoryFilterBar
+          value={config.vehicleCategory ?? "voiture"}
+          onChange={(vehicleCategory) => onChange({ ...config, vehicleCategory })}
+        />
+        <p className="text-xs text-slate-500 mt-2">
+          Voitures, motos, ou les deux — le scan et les listes suivent ce choix.
+        </p>
+      </div>
+
       <label className="flex items-center gap-3 cursor-pointer mb-4">
         <input
           type="checkbox"
@@ -55,7 +66,7 @@ export function BudgetFilter({ config, onChange, matchedCount, totalCount }: Pro
           className="w-4 h-4 rounded"
         />
         <span className="text-sm text-slate-300">
-          Particulier uniquement — tourisme roulant (sans utilitaire / pro / non roulant)
+          Particulier uniquement — sans utilitaire / pro / non roulant
         </span>
       </label>
 

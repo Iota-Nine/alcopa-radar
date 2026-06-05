@@ -4,6 +4,7 @@ import {
   effectiveMarginForRanking,
 } from "@/lib/expert/repair-margin";
 import { filterByBudget, filterForParticulier } from "@/lib/filters";
+import { filterByVehicleCategory } from "@/lib/filters/vehicle-category";
 import type { AlertConfig, ScoredVehicle, Verdict } from "@/types/vehicle";
 
 export const CATALOG_URL = "https://www.alcopa-auction.fr/recherche";
@@ -56,19 +57,19 @@ export interface GoodDealsOptions {
   applyBudget?: boolean;
   config?: Pick<
     AlertConfig,
-    "priceFilterEnabled" | "budgetMin" | "budgetMax" | "particulierOnly"
+    "priceFilterEnabled" | "budgetMin" | "budgetMax" | "particulierOnly" | "vehicleCategory"
   >;
 }
 
 type DealsFilterOptions =
   | GoodDealsOptions
-  | Pick<AlertConfig, "priceFilterEnabled" | "budgetMin" | "budgetMax" | "particulierOnly">;
+  | Pick<AlertConfig, "priceFilterEnabled" | "budgetMin" | "budgetMax" | "particulierOnly" | "vehicleCategory">;
 
 function isAlertConfigSlice(
   o: DealsFilterOptions
 ): o is Pick<
   AlertConfig,
-  "priceFilterEnabled" | "budgetMin" | "budgetMax" | "particulierOnly"
+  "priceFilterEnabled" | "budgetMin" | "budgetMax" | "particulierOnly" | "vehicleCategory"
 > {
   return "priceFilterEnabled" in o && !("applyBudget" in o);
 }
@@ -101,6 +102,9 @@ function applyDealsFilter(
   if (config?.particulierOnly !== false) {
     list = filterForParticulier(list);
   }
+  if (config?.vehicleCategory) {
+    list = filterByVehicleCategory(list, config.vehicleCategory);
+  }
   if (applyBudget && config) return filterByBudget(list, config);
   return list;
 }
@@ -130,7 +134,7 @@ export function getTopDeals(
   limit = 10,
   config?: Pick<
     AlertConfig,
-    "priceFilterEnabled" | "budgetMin" | "budgetMax" | "particulierOnly"
+    "priceFilterEnabled" | "budgetMin" | "budgetMax" | "particulierOnly" | "vehicleCategory"
   >,
   lbcPrices?: Record<string, number>
 ): ScoredVehicle[] {
@@ -156,7 +160,7 @@ export function countGoodDeals(
   applyBudget = false,
   config?: Pick<
     AlertConfig,
-    "priceFilterEnabled" | "budgetMin" | "budgetMax" | "particulierOnly"
+    "priceFilterEnabled" | "budgetMin" | "budgetMax" | "particulierOnly" | "vehicleCategory"
   >,
   lbcPrices?: Record<string, number>
 ): number {

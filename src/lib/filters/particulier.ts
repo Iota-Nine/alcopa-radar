@@ -7,7 +7,7 @@ export interface ParticulierClassification {
 }
 
 const PRO_URL =
-  /\/(?:utilitaire-occasion|materiel-occasion|moto-occasion)\//i;
+  /\/(?:utilitaire-occasion|materiel-occasion)\//i;
 
 const PRO_TYPE =
   /\b(utilitaire|utilitaires|vul|fourgon|fourgonnette|camion|camionnette|engin|materiel|d[eé]riv[eé]\s*vp|n1|n2|pl\b|semi-remorque|remorque)\b/i;
@@ -69,7 +69,7 @@ export function classifyParticulierVehicle(vehicle: VehicleData): ParticulierCla
   const isPro = isProVehicle(vehicle);
   const isNonDriving = isNonDrivingVehicle(vehicle);
 
-  if (isProVehicleUrl(vehicle.url)) reasons.push("fiche utilitaire / pro");
+  if (isProVehicleUrl(vehicle.url)) reasons.push("fiche utilitaire / matériel");
   else if (vehicle.vehicleType?.toLowerCase().includes("utilitaire")) {
     reasons.push(`type ${vehicle.vehicleType}`);
   } else if (vehicle.bodyType && PRO_BODY.test(vehicle.bodyType)) {

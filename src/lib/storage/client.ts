@@ -26,6 +26,7 @@ function normalizeAlertConfig(raw: Partial<AlertConfig>): AlertConfig {
     maxDaysUntilAuction: raw.maxDaysUntilAuction ?? 1,
     autoWatchEnabled: raw.autoWatchEnabled ?? true,
     particulierOnly: raw.particulierOnly ?? true,
+    vehicleCategory: raw.vehicleCategory ?? "voiture",
     brands: raw.brands ?? ["Audi", "BMW", "Mercedes", "Toyota"],
     scoreMinimum: raw.scoreMinimum ?? 8,
     enabled: raw.enabled ?? true,

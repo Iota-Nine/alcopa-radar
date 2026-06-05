@@ -13,7 +13,7 @@ import {
   type MotorFuelFilter,
   vehicleFuelDisplayLabel,
 } from "@/lib/filters/motor-fuel";
-import { filterByBudget, filterForParticulier } from "@/lib/filters";
+import { filterByBudget, filterByVehicleCategory, filterForParticulier } from "@/lib/filters";
 import { searchCatalog } from "@/lib/search/catalog-search";
 import { useLbcPriceStore } from "@/hooks/useLbcPriceStore";
 import { useAlertConfig, useScanHistory } from "@/lib/storage/client";
@@ -36,6 +36,7 @@ export default function CataloguePage() {
 
   const preFuelList = useMemo(() => {
     let list = filterForParticulier([...history], config.particulierOnly !== false);
+    list = filterByVehicleCategory(list, config.vehicleCategory ?? "voiture");
     if (onlyBudget) list = filterByBudget(list, config);
     if (debouncedSearch) list = searchCatalog(list, debouncedSearch);
     if (verdictFilter !== "ALL") {

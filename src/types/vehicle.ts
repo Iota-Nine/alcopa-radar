@@ -102,6 +102,10 @@ export interface ScoredVehicle {
   scannedAt: string;
 }
 
+import type { VehicleCategoryFilter } from "@/lib/filters/vehicle-category";
+
+export type { VehicleCategoryFilter };
+
 export interface AlertConfig {
   /** Prix minimum (mise à prix Alcopa), 0 = pas de plancher */
   budgetMin: number;
@@ -115,6 +119,8 @@ export interface AlertConfig {
   autoWatchEnabled: boolean;
   /** Exclure utilitaires / pro et non roulants */
   particulierOnly: boolean;
+  /** Voitures, motos, ou les deux (scan + listes) */
+  vehicleCategory: VehicleCategoryFilter;
   brands: string[];
   scoreMinimum: number;
   enabled: boolean;

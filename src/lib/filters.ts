@@ -3,8 +3,17 @@ import {
   countParticulierEligible,
   filterForParticulier,
 } from "@/lib/filters/particulier";
+import { filterByVehicleCategory } from "@/lib/filters/vehicle-category";
 
 export { filterForParticulier, countParticulierEligible } from "@/lib/filters/particulier";
+export {
+  filterByVehicleCategory,
+  countByVehicleCategory,
+  vehicleCategoryFromUrl,
+  vehicleCategoryLabel,
+  matchesVehicleCategory,
+} from "@/lib/filters/vehicle-category";
+export type { VehicleCategoryFilter } from "@/lib/filters/vehicle-category";
 export type { ParticulierClassification } from "@/lib/filters/particulier";
 export {
   classifyParticulierVehicle,
@@ -34,10 +43,15 @@ export function applyDisplayFilters(
   results: ScoredVehicle[],
   config: Pick<
     AlertConfig,
-    "priceFilterEnabled" | "budgetMin" | "budgetMax" | "particulierOnly"
+    | "priceFilterEnabled"
+    | "budgetMin"
+    | "budgetMax"
+    | "particulierOnly"
+    | "vehicleCategory"
   >
 ): ScoredVehicle[] {
   let list = filterForParticulier(results, config.particulierOnly !== false);
+  list = filterByVehicleCategory(list, config.vehicleCategory ?? "voiture");
   list = filterByBudget(list, config);
   return list;
 }

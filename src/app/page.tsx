@@ -26,6 +26,7 @@ export default function RadarPage() {
       budgetMin: config.budgetMin,
       budgetMax: config.budgetMax,
       particulierOnly: config.particulierOnly,
+      vehicleCategory: config.vehicleCategory,
     }
   );
   const { saveResults } = useScanHistory();

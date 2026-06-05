@@ -17,7 +17,8 @@ import {
 } from "@/lib/storage/scan-cache";
 import { fetchJson } from "@/lib/fetch-json";
 import { shouldAnalyzeListingPreview } from "@/lib/filters/listing-preview";
-import { isParticulierVehicle, isProVehicleUrl } from "@/lib/filters/particulier";
+import { isParticulierVehicle } from "@/lib/filters/particulier";
+import { isUtilitaireUrl, matchesVehicleCategory } from "@/lib/filters/vehicle-category";
 import type { AlertConfig, ScoredVehicle, VehicleData } from "@/types/vehicle";
 
 export interface RunScanOptions {
@@ -67,7 +68,11 @@ export interface ScanProgress {
 
 export type ScanFilters = Pick<
   AlertConfig,
-  "priceFilterEnabled" | "budgetMin" | "budgetMax" | "particulierOnly"
+  | "priceFilterEnabled"
+  | "budgetMin"
+  | "budgetMax"
+  | "particulierOnly"
+  | "vehicleCategory"
 >;
 
 const DEFAULT_SCAN_FILTERS: ScanFilters = {
@@ -75,6 +80,7 @@ const DEFAULT_SCAN_FILTERS: ScanFilters = {
   budgetMin: 0,
   budgetMax: 999_999,
   particulierOnly: true,
+  vehicleCategory: "voiture",
 };
 
 export function useAutoScan(
@@ -234,8 +240,13 @@ export function useAutoScan(
         const eligible: string[] = [];
 
         for (const url of urls) {
-          if (isProVehicleUrl(url)) {
+          if (isUtilitaireUrl(url)) {
             skippedPro++;
+            continue;
+          }
+
+          const category = scanFiltersRef.current.vehicleCategory ?? "voiture";
+          if (!matchesVehicleCategory(url, category)) {
             continue;
           }
 
